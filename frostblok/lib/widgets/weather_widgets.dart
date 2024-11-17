@@ -1,25 +1,11 @@
 import 'package:flutter/material.dart';
 
 class WeatherCard extends StatelessWidget {
-  final String location;
-  final String date;
-  final String weatherDescription;
-  final int temperature;
-  final String windSpeed;
-  final String pressure;
-  final String chanceOfIce;
-  final String humidity;
+  final List<Map<String, dynamic>> weatherData;
 
   const WeatherCard({
     super.key,
-    required this.location,
-    required this.date,
-    required this.weatherDescription,
-    required this.temperature,
-    required this.windSpeed,
-    required this.pressure,
-    required this.chanceOfIce,
-    required this.humidity,
+    required this.weatherData,
   });
 
   @override
@@ -40,75 +26,98 @@ class WeatherCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Location and Carousel Indicator
-          Text(
-            location,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.circle, size: 8, color: Colors.grey),
-              SizedBox(width: 4),
-              Icon(Icons.circle, size: 8, color: Colors.grey),
-              SizedBox(width: 4),
-              Icon(Icons.circle, size: 8, color: Colors.grey),
-            ],
-          ),
-          const SizedBox(height: 16),
-          
-          // Main Weather Information in Two Columns
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Weather Icon Column
-              const Column(
-                children: [
-                  Icon(
-                    Icons.cloud, // Use an appropriate weather icon
-                    size: 64,
-                    color: Colors.blueAccent,
-                  ),
-                ],
-              ),
-              // Date and Temperature Column
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    date,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '$temperature°',
-                    style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    weatherDescription,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
+          SizedBox(
+            height: 330, // Fixed height for the carousel
+            child: PageView.builder(
+              itemCount: weatherData.length,
+              itemBuilder: (context, index) {
+                final weather = weatherData[index];
+                return Column(
+                  children: [
+                    // Location and Indicator
+                    Text(
+                      weather['location'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        weatherData.length,
+                        (dotIndex) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Icon(
+                            Icons.circle,
+                            size: 8,
+                            color: index == dotIndex
+                                ? Colors.blueAccent
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
-          // Weather Details in Grid Style (2x2)
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 3,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              _buildWeatherDetail(Icons.air, windSpeed, 'Wind'),
-              _buildWeatherDetail(Icons.compress, pressure, 'Pressure'),
-              _buildWeatherDetail(Icons.ac_unit, chanceOfIce, 'Chance of Ice'),
-              _buildWeatherDetail(Icons.water_drop, humidity, 'Humidity'),
-            ],
+                    // Weather Information
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        const Icon(
+                          Icons.cloud,
+                          size: 64,
+                          color: Colors.blueAccent,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              weather['date'],
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${weather['temperature']}°',
+                              style: const TextStyle(
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              weather['weatherDescription'],
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Weather Details
+                    Center(
+                      child: SizedBox(
+                        width: 300, // Adjust this width to control centering
+                        child: GridView.count(
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          childAspectRatio: 3,
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: [
+                            _buildWeatherDetail(Icons.air, weather['windSpeed'], 'Wind'),
+                            _buildWeatherDetail(Icons.compress, weather['pressure'], 'Pressure'),
+                            _buildWeatherDetail(Icons.ac_unit, weather['chanceOfIce'], 'Chance of Ice'),
+                            _buildWeatherDetail(Icons.water_drop, weather['humidity'], 'Humidity'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -118,12 +127,18 @@ class WeatherCard extends StatelessWidget {
   Widget _buildWeatherDetail(IconData icon, String valueWithUnit, String label) {
     return Row(
       children: [
-        Icon(icon, color: Colors.blueAccent, size: 20),
-        const SizedBox(width: 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(valueWithUnit, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Icon(icon, color: Colors.blueAccent, size: 20),
+            const SizedBox(width: 8),
+          ]
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(valueWithUnit,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
           ],
         ),

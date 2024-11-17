@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frostblok/widgets/weather_widgets.dart';
 import 'package:frostblok/widgets/device_widget.dart';
+import 'package:frostblok/pages/defrost_device.dart';  // Import DefrostDevicePage
 
 class HomePage extends StatefulWidget {
   @override
@@ -8,21 +9,63 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // List to keep track of added DeviceCards
-  List<Widget> deviceCards = [];
+  List<Map<String, dynamic>> weatherData = [
+    {
+      'location': 'Garden City',
+      'date': 'Sunday | Nov 14',
+      'weatherDescription': 'Heavy rain',
+      'temperature': 29,
+      'windSpeed': '3.7 mph',
+      'pressure': '1010 mbar',
+      'chanceOfIce': '70%',
+      'humidity': '83%',
+    }
+  ];
+
+  List<Widget> deviceCards = [
+    DeviceCard(
+      temperature: 29,
+      location: 'Garden City, UT',
+      status: 'Drains are Safe!',
+      onToggle: () {},
+      onTap: (context) {
+        // Pass context here to navigate
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DefrostDevicePage()),
+        );
+      },
+    )
+  ];
 
   void _addNewDevice() {
     setState(() {
       deviceCards.add(
         DeviceCard(
-          temperature: 29, // Example data
-          location: 'Garden City, UT',
+          temperature: 30,
+          location: 'New Location ${deviceCards.length + 1}',
           status: 'Drains are Safe!',
-          onToggle: () {
-            // Define toggle functionality here
+          onToggle: () {},
+          onTap: (context) {
+            // Navigate onTap with context
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DefrostDevicePage()),
+            );
           },
         ),
       );
+
+      weatherData.add({
+        'location': 'New Location ${weatherData.length + 1}',
+        'date': 'Monday | Nov 15',
+        'weatherDescription': 'Cloudy',
+        'temperature': 30,
+        'windSpeed': '4.0 mph',
+        'pressure': '1015 mbar',
+        'chanceOfIce': '50%',
+        'humidity': '75%',
+      });
     });
   }
 
@@ -36,24 +79,13 @@ class _HomePageState extends State<HomePage> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Weather Card widget
-                const WeatherCard(
-                  location: 'Garden City',
-                  date: 'Sunday | Nov 14',
-                  weatherDescription: 'Heavy rain',
-                  temperature: 29,
-                  windSpeed: '3.7 mph',
-                  pressure: '1010 mbar',
-                  chanceOfIce: '70%',
-                  humidity: '83%',
-                ),
+                WeatherCard(weatherData: weatherData),
                 const SizedBox(height: 16),
-                // Add New Device Button
                 ElevatedButton(
                   onPressed: _addNewDevice,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white, // Replaces 'primary'
-                    foregroundColor: Colors.black, // Replaces 'onPrimary'
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16.0),
                     ),
@@ -71,8 +103,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                // Display list of DeviceCards
                 ...deviceCards,
               ],
             ),
