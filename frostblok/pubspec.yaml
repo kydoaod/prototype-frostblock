@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   carousel_slider: ^5.0.0
   awesome_notifications: ^0.10.0
+  flutter_blue_plus: ^1.34.5
 
 dev_dependencies:
   flutter_test:

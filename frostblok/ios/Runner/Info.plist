@@ -45,5 +45,18 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app uses Bluetooth to connect to nearby devices.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app requires Bluetooth to communicate with external devices.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to your location for Bluetooth scanning.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs background location access to perform Bluetooth operations.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+	</array>
 </dict>
 </plist>
