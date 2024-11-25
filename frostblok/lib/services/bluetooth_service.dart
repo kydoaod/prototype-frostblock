@@ -1,19 +1,16 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BluetoothService {
-  final FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
 
   // Initialize Bluetooth and ensure permissions are granted
   Future<void> initializeBluetooth() async {
-    // Check Bluetooth state
-    final bluetoothState = await flutterBlue.state.first;
-    if (bluetoothState != BluetoothState.on) {
+    final bluetoothState = await FlutterBluePlus.adapterState.first;
+    if (bluetoothState != BluetoothAdapterState.on) {
       print('Bluetooth is not enabled. Please enable it.');
     }
 
-    // Request permissions if required
-    final isAvailable = await flutterBlue.isAvailable;
-    final isOn = await flutterBlue.isOn;
+    final isAvailable = await FlutterBluePlus.isSupported;
+    final isOn = bluetoothState == BluetoothAdapterState.on;
 
     if (!isAvailable || !isOn) {
       throw Exception('Bluetooth is not available or enabled.');
@@ -21,14 +18,14 @@ class BluetoothService {
   }
 
   // Start scanning for devices
-  Stream<ScanResult> startScan({Duration timeout = const Duration(seconds: 5)}) {
-    flutterBlue.startScan(timeout: timeout);
-    return flutterBlue.scanResults.expand((results) => results);
+  Stream<List<ScanResult>> startScan({Duration timeout = const Duration(seconds: 5)}) {
+    FlutterBluePlus.startScan(timeout: timeout);
+    return FlutterBluePlus.scanResults;
   }
 
   // Stop scanning for devices
   Future<void> stopScan() async {
-    await flutterBlue.stopScan();
+    await FlutterBluePlus.stopScan();
   }
 
   // Connect to a selected device
