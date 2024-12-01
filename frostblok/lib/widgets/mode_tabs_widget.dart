@@ -9,16 +9,30 @@ class ModeTabs extends StatefulWidget {
 }
 
 class _ModeTabsState extends State<ModeTabs> {
-  int _selectedIndex = 0; // Default selected tab (Schedule)
-
-  // Schedule Date-Time variables
+  int _selectedIndex = 0;
   DateTime _selectedFromDate = DateTime.now();
   TimeOfDay _selectedFromTime = const TimeOfDay(hour: 8, minute: 0);
   DateTime _selectedToDate = DateTime.now();
   TimeOfDay _selectedToTime = const TimeOfDay(hour: 17, minute: 0);
 
+  bool _isDefrosting = false; // Added state to track defrosting
+
+  // Theme Colors
+  Color _activeThemeColor = Colors.blueAccent;
+
+  void _toggleDefrost() {
+    setState(() {
+      _isDefrosting = !_isDefrosting;
+      _activeThemeColor = _isDefrosting ? Colors.amberAccent : Colors.blueAccent;
+    });
+  }
+
   void _showDateTimePicker(
-      BuildContext context, DateTime initialDate, TimeOfDay initialTime, Function(DateTime, TimeOfDay) onDateTimeChanged) async {
+    BuildContext context,
+    DateTime initialDate,
+    TimeOfDay initialTime,
+    Function(DateTime, TimeOfDay) onDateTimeChanged,
+  ) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -43,22 +57,17 @@ class _ModeTabsState extends State<ModeTabs> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          _showDateTimePicker(
-            context,
-            date,
-            time,
-            (pickedDate, pickedTime) {
-              setState(() {
-                if (label == "From") {
-                  _selectedFromDate = pickedDate;
-                  _selectedFromTime = pickedTime;
-                } else {
-                  _selectedToDate = pickedDate;
-                  _selectedToTime = pickedTime;
-                }
-              });
-            },
-          );
+          _showDateTimePicker(context, date, time, (pickedDate, pickedTime) {
+            setState(() {
+              if (label == "From") {
+                _selectedFromDate = pickedDate;
+                _selectedFromTime = pickedTime;
+              } else {
+                _selectedToDate = pickedDate;
+                _selectedToTime = pickedTime;
+              }
+            });
+          });
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -69,6 +78,7 @@ class _ModeTabsState extends State<ModeTabs> {
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
@@ -83,7 +93,7 @@ class _ModeTabsState extends State<ModeTabs> {
 
   Widget _buildSegmentContent() {
     switch (_selectedIndex) {
-      case 0: // Schedule Mode
+      case 0:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -95,25 +105,31 @@ class _ModeTabsState extends State<ModeTabs> {
               ),
             ),
             const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Row(
-                children: [
-                  _buildDateTimePicker(
-                      context, "From", _selectedFromDate, _selectedFromTime),
-                  Container(
-                    width: 1,
-                    height: 60,
-                    color: Colors.grey,
-                  ),
-                  _buildDateTimePicker(
-                      context, "To", _selectedToDate, _selectedToTime),
-                ],
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey.shade100,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15),
+                child: Row(
+                  children: [
+                    _buildDateTimePicker(
+                        context, "From", _selectedFromDate, _selectedFromTime),
+                    Container(
+                      width: 1,
+                      height: 60,
+                      color: Colors.grey,
+                    ),
+                    _buildDateTimePicker(
+                        context, "To", _selectedToDate, _selectedToTime),
+                  ],
+                ),
               ),
             ),
           ],
         );
-      case 1: // Timer Mode
+      case 1:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -126,12 +142,11 @@ class _ModeTabsState extends State<ModeTabs> {
             ),
             Center(
               child: SizedBox(
-                height: 150,
+                height: 120,
                 child: CupertinoTimerPicker(
-                  mode: CupertinoTimerPickerMode.hms, // Hours, Minutes, Seconds
+                  mode: CupertinoTimerPickerMode.hms,
                   initialTimerDuration: const Duration(minutes: 15),
                   onTimerDurationChanged: (Duration newDuration) {
-                    // Handle timer duration selection
                     print("Selected duration: $newDuration");
                   },
                 ),
@@ -139,7 +154,7 @@ class _ModeTabsState extends State<ModeTabs> {
             ),
           ],
         );
-      case 2: // Manual Mode
+      case 2:
         return const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -158,11 +173,88 @@ class _ModeTabsState extends State<ModeTabs> {
     }
   }
 
+  Widget _buildSegmentedControl() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 36,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: List.generate(3, (index) {
+          final bool isSelected = _selectedIndex == index;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected ? _activeThemeColor : Colors.transparent,
+                  borderRadius: isSelected ? BorderRadius.circular(24) : BorderRadius.zero,
+                ),
+                child: Text(
+                  index == 0
+                      ? 'Schedule'
+                      : index == 1
+                          ? 'Timer'
+                          : 'Manual',
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black54,
+                    fontSize: 16,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildDefrostButton() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: _activeThemeColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0, 4),
+              blurRadius: 8,
+            ),
+          ],
+        ),
+        child: MaterialButton(
+          onPressed: _toggleDefrost,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Text(
+            _isDefrosting ? 'Device is Running...' : 'Start Defrost',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // "Mode" Label
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Text(
@@ -170,24 +262,12 @@ class _ModeTabsState extends State<ModeTabs> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
-        // Segmented Button
-        CupertinoSegmentedControl<int>(
-          children: const {
-            0: Text("Schedule"),
-            1: Text("Timer"),
-            2: Text("Manual"),
-          },
-          onValueChanged: (int value) {
-            setState(() {
-              _selectedIndex = value;
-            });
-          },
-          groupValue: _selectedIndex,
-        ),
+        _buildSegmentedControl(),
         const SizedBox(height: 16),
-        Expanded(
-          child: _buildSegmentContent(),
-        ),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildSegmentContent()),
+          _buildDefrostButton(),
       ],
     );
   }

@@ -3,7 +3,7 @@ import 'package:frostblok/widgets/circular_indicator_widget.dart';
 import 'package:frostblok/widgets/mode_tabs_widget.dart'; // Ensure you have this widget
 
 class DefrostDevicePage extends StatelessWidget {
-  const DefrostDevicePage({Key? key}) : super(key: key);
+  const DefrostDevicePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,10 @@ class DefrostDevicePage extends StatelessWidget {
           const SizedBox(height: 20),
           const CircularIndicator(
             progress: 0.40, // Example progress
-            progressColor: Colors.blueAccent,
+            startColor: Color.fromARGB(255, 0, 112, 255),
+            endColor: Color.fromARGB(255, 0, 178, 255),
+            temperature: "29 °F",
+            label: "Outdoor Temperature",
             size: 175,
           ),
           const SizedBox(height: 50),
@@ -37,7 +40,7 @@ class DefrostDevicePage extends StatelessWidget {
                   topRight: Radius.circular(16),
                 ),
               ),
-              child: ModeTabs(), // Assuming you want tabs for controlling modes
+              child: const ModeTabs(), // Assuming you want tabs for controlling modes
             ),
           ),
         ],
