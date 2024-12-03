@@ -41,7 +41,7 @@ class ApiFetch {
     String params,
     http.MultipartRequest body,
   ) async {
-    final query = queryJson.isNotEmpty ? '?' + Uri(queryParameters: queryJson).query : '';
+    final query = queryJson.isNotEmpty ? '?${Uri(queryParameters: queryJson).query}' : '';
     final headers = {'Content-Type': 'multipart/form-data', ...headersJson};
 
     body.headers.addAll(headers);
@@ -56,7 +56,7 @@ class ApiFetch {
     String params,
     Map<String, dynamic> body,
   ) async {
-    final query = queryJson.isNotEmpty ? '?' + Uri(queryParameters: queryJson).query : '';
+    final query = queryJson.isNotEmpty ? '?${Uri(queryParameters: queryJson).query}' : '';
     final headers = {'Content-Type': 'application/json', ...headersJson};
 
     return await http.patch(
