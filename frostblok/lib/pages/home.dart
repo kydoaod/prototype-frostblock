@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frostblok/utils/converters.dart';
 import 'package:frostblok/widgets/weather_widgets.dart';
 import 'package:frostblok/widgets/device_widget.dart';
 import 'package:frostblok/pages/defrost_device.dart';  // Import DefrostDevicePage
@@ -19,15 +20,6 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
   @override
   bool get wantKeepAlive => true; // Keep the widget state alive
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Reload weather data when this page is returned to (useful when switching tabs)
-    if (weatherData.isEmpty) {
-      _loadWeatherData();
-    }
-  }
 
   List<Widget> deviceCards = [
     DeviceCard(
@@ -95,33 +87,34 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     if (forecasts != null && forecasts.isNotEmpty) {
       setState(() {
         for(var forecast in forecasts){
+          double tempCelsius = kelvinToCelsius(forecast['main']['temp']);
+          double humidity = forecast['main']['humidity'].toDouble();
+          double rain = forecast['rain']?['3h'] ?? 0.0;  // Rain in the past 3 hours, if available
+          
+          String chanceOfIce = calculateChanceOfIce(tempCelsius, humidity, rain);
           weatherData.add({
             'location': location,
-            'date': 'Today | ${_formatDate(forecast['dt'])}',
+            'date': 'Today | ${formatDate(forecast['dt'])}',
             'weatherClassification': forecast['weather'][0]['main'] ?? 'No description',
             'weatherDescription': forecast['weather'][0]['description'] ?? 'No description',
-            'temperature': _kelvinToCelsius(forecast['main']['temp']).toStringAsFixed(2),
+            'temperature': kelvinToCelsius(forecast['main']['temp']).toStringAsFixed(2),
             'windSpeed': '${forecast['wind']['speed']} m/s',
             'pressure': '${forecast['main']['pressure']} hPa',
-            'chanceOfIce': 'N/A', // Example value, adjust based on the data
+            'chanceOfIce': chanceOfIce, // Example value, adjust based on the data
             'humidity': '${forecast['main']['humidity']}%',
           });
         }
       });
     } 
   }
-  
-  void refresh() {
-    _loadWeatherData();
-  }
 
-  double _kelvinToCelsius(double kelvin) {
-    return kelvin - 273.15;  // Conversion formula
-  }
-
-  String _formatDate(int timestamp) {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-    return '${date.month}/${date.day}/${date.year}'; // Customize this format as needed
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reload weather data when this page is returned to (useful when switching tabs)
+    if (weatherData.isEmpty) {
+      _loadWeatherData();
+    }
   }
 
   @override
