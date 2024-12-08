@@ -8,6 +8,30 @@ class WeatherCard extends StatelessWidget {
     required this.weatherData,
   });
 
+  IconData _getWeatherIcon(String weatherClassification) {
+    switch (weatherClassification.toLowerCase()) {
+      case 'clear':
+        return Icons.wb_sunny; // Icon for sunny weather
+      case 'rain':
+      case 'shower rain':
+      case 'light rain':
+        return Icons.beach_access; // Icon for rain
+      case 'clouds':
+        return Icons.cloud; // Icon for cloudy weather
+      case 'snow':
+        return Icons.ac_unit; // Icon for snow
+      case 'thunderstorm':
+        return Icons.flash_on; // Icon for thunderstorm
+      case 'drizzle':
+        return Icons.grain; // Icon for drizzle
+      case 'mist':
+      case 'fog':
+        return Icons.blur_on; // Icon for mist or fog
+      default:
+        return Icons.help_outline; // Default icon
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -65,8 +89,8 @@ class WeatherCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        const Icon(
-                          Icons.cloud,
+                        Icon(
+                          _getWeatherIcon(weather['weatherClassification']??''),
                           size: 64,
                           color: Colors.blueAccent,
                         ),
