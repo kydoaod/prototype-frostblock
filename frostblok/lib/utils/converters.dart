@@ -8,16 +8,34 @@ String formatDate(int timestamp) {
 }
 
 String calculateChanceOfIce(double tempCelsius, double humidity, double rain) {
-  print("$tempCelsius, $humidity, $rain");
+  
+  // Initialize the percentage as 0 (no chance)
+  double iceChance = 0.0;
+  
+  // If temperature is at or below freezing (0°C), ice chance starts high
   if (tempCelsius <= 0) {
-    return 'High';  // 100% chance of ice
-  } else if (tempCelsius > 0 && tempCelsius <= 5) {
+    iceChance = 100.0;
+  } 
+  // For temperatures between 1°C and 5°C, there's a moderate chance
+  else if (tempCelsius > 0 && tempCelsius <= 5) {
+    iceChance = 50.0;  // Base chance is 50%
+    
+    // Adjust based on rain and humidity
     if (rain > 0 || humidity > 80) {
-      return 'Moderate';  // 50% chance of ice
+      iceChance += 30.0; // Increase by 30% if there's rain or high humidity
     } else {
-      return 'Low';  // Lower chance, but still possible
+      iceChance += 10.0; // Slight increase if conditions are cool and dry
     }
-  } else {
-    return 'None';  // Very low chance of ice
+  } 
+  // Above 5°C, chances are very low
+  else {
+    iceChance = 0.0;  // No chance of ice
   }
+
+  // Ensure the percentage is capped at 100
+  iceChance = iceChance.clamp(0.0, 100.0);
+
+  // Return the percentage as a string with one decimal place
+  return "${iceChance.toStringAsFixed(1)}%";
 }
+

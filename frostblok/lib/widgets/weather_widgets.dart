@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frostblok/utils/svg_icons.dart';
 
 class WeatherCard extends StatelessWidget {
   final List<Map<String, dynamic>> weatherData;
@@ -8,29 +10,32 @@ class WeatherCard extends StatelessWidget {
     required this.weatherData,
   });
 
-  IconData _getWeatherIcon(String weatherClassification) {
+  SvgPicture _getWeatherIcon(String weatherClassification,
+    {double size = 64, Color? color}) {
     switch (weatherClassification.toLowerCase()) {
       case 'clear':
-        return Icons.wb_sunny; // Icon for sunny weather
+        return SvgIcons.cloudSunny(size: size, color: color);
       case 'rain':
       case 'shower rain':
       case 'light rain':
-        return Icons.beach_access; // Icon for rain
-      case 'clouds':
-        return Icons.cloud; // Icon for cloudy weather
+        return SvgIcons.cloudSunshower(size: size, color: color);
       case 'snow':
-        return Icons.ac_unit; // Icon for snow
+        return SvgIcons.cloudSnow(size: size, color: color);
+      case 'clouds':
+        return SvgIcons.cloudClouds(size: size, color: color);
       case 'thunderstorm':
-        return Icons.flash_on; // Icon for thunderstorm
+        return SvgIcons.cloudThunderstorm(size: size, color: color);
       case 'drizzle':
-        return Icons.grain; // Icon for drizzle
+        return SvgIcons.cloudDrizzle(size: size, color: color);
       case 'mist':
       case 'fog':
-        return Icons.blur_on; // Icon for mist or fog
+        return SvgIcons.cloudMistFog(size: size, color: color);
       default:
-        return Icons.help_outline; // Default icon
+        return SvgIcons.cloudHelpOutline(size: size, color: color);
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +56,7 @@ class WeatherCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
-            height: 330, // Fixed height for the carousel
+            height: 310, // Fixed height for the carousel
             child: PageView.builder(
               itemCount: weatherData.length,
               itemBuilder: (context, index) {
@@ -89,11 +94,7 @@ class WeatherCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Icon(
-                          _getWeatherIcon(weather['weatherClassification']??''),
-                          size: 64,
-                          color: Colors.blueAccent,
-                        ),
+                        _getWeatherIcon(weather['weatherClassification'] ?? ''),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -117,7 +118,9 @@ class WeatherCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
+                    const Divider(),
+                    const SizedBox(height: 8),
                     // Weather Details
                     Center(
                       child: SizedBox(
@@ -130,10 +133,10 @@ class WeatherCard extends StatelessWidget {
                           childAspectRatio: 3,
                           physics: const NeverScrollableScrollPhysics(),
                           children: [
-                            _buildWeatherDetail(Icons.air, weather['windSpeed'], 'Wind'),
-                            _buildWeatherDetail(Icons.compress, weather['pressure'], 'Pressure'),
-                            _buildWeatherDetail(Icons.ac_unit, weather['chanceOfIce'], 'Chance of Ice'),
-                            _buildWeatherDetail(Icons.water_drop, weather['humidity'], 'Humidity'),
+                            _buildWeatherDetail(SvgIcons.indicatorWindDir(size: 20, color: Colors.black), weather['windSpeed'], 'Wind'),
+                            _buildWeatherDetail(SvgIcons.indicatorSnow(size: 20, color: Colors.black), weather['chanceOfIce'], 'Chance of Ice'),
+                            _buildWeatherDetail(SvgIcons.indicatorTemperature(size: 20, color: Colors.black), weather['pressure'], 'Pressure'),
+                            _buildWeatherDetail(SvgIcons.indicatorHumidity(size: 20, color: Colors.black), weather['humidity'], 'Humidity'),
                           ],
                         ),
                       ),
@@ -148,16 +151,18 @@ class WeatherCard extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherDetail(IconData icon, String valueWithUnit, String label) {
+  Widget _buildWeatherDetail(
+      SvgPicture svgIcon, String valueWithUnit, String label) {
     return Row(
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: Colors.blueAccent, size: 20),
+            svgIcon,
             const SizedBox(width: 8),
-          ]
+          ],
         ),
+        const SizedBox(width: 4),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -169,4 +174,5 @@ class WeatherCard extends StatelessWidget {
       ],
     );
   }
+
 }

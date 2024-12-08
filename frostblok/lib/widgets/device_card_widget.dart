@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:frostblok/utils/svg_icons.dart';
 
 class DeviceCard extends StatelessWidget {
   final int temperature;
   final String location;
   final String status;
   final VoidCallback onToggle;
-  final void Function(BuildContext context) onTap; // Change to take context
+  final void Function(BuildContext context) onTap;
 
   const DeviceCard({
     required this.temperature,
     required this.location,
     required this.status,
     required this.onToggle,
-    required this.onTap, // Accept the onTap function with context
+    required this.onTap,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => onTap(context), // Pass the context to onTap
+      onTap: () => onTap(context),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         padding: const EdgeInsets.all(16.0),
@@ -61,8 +62,9 @@ class DeviceCard extends StatelessWidget {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.toggle_off),
-              color: Colors.grey.shade400,
+              icon: status == 'on'
+                  ? SvgIcons.actionDefrostOn(size: 24, color: Colors.blueAccent)
+                  : SvgIcons.actionDefrostOff(size: 24, color: Colors.grey.shade400),
               onPressed: onToggle,
             ),
           ],
