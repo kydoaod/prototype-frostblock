@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
             'date': '$dayOfWeek | $formattedDate $timeOfDay',
             'weatherClassification': forecast['weather'][0]['main'] ?? 'No description',
             'weatherDescription': forecast['weather'][0]['description'] ?? 'No description',
-            'temperature': tempCelsius.toStringAsFixed(2),
+            'temperature': tempCelsius.round().toInt(),
             'windSpeed': '${forecast['wind']['speed']} m/s',
             'pressure': '${forecast['main']['pressure']} hPa',
             'chanceOfIce': chanceOfIce,
