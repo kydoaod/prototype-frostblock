@@ -51,52 +51,36 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     });
   }
 
+
   Future<void> _loadWeatherData() async {
     try {
-      // Fetch geocode data (lat, lon) for Muntinlupa
-      final muntinlupaData = await WeatherApi.getGeocodeData('Muntinlupa');
-      final muntinlupaLat = muntinlupaData['lat'];
-      final muntinlupaLon = muntinlupaData['lon'];
-
-      // Fetch weather forecast for Muntinlupa
-      final muntinlupaWeather = await WeatherApi.getWeatherForecast(muntinlupaLat, muntinlupaLon);
-
-      // Check if the weather data is available
-      _formatWeatherData('Muntinlupa', muntinlupaWeather);
-    } catch (e) {
-      // Handle error loading weather data
-      print('Error fetching weather data: $e');
-    }
+      final weather = await WeatherApi.getWeatherForecast('Muntinlupa', 3);
+      _formatWeatherData('Muntinlupa', weather);
+    } catch (e, stackTrace) {
+    print('Error fetching weather data: $e');
+    print('Stack trace: $stackTrace'); // Ito ang magpapakita ng buong stack trace
+  }
   }
 
   void _formatWeatherData(String location, Map<String, dynamic> weather) {
-    // Ensure the forecast exists and is not empty
     final forecasts = weather['forecast'];
     if (forecasts != null && forecasts.isNotEmpty) {
+      weatherData.clear();
       setState(() {
         for (var forecast in forecasts) {
-          double tempCelsius = kelvinToCelsius(forecast['main']['temp']);
-          double humidity = forecast['main']['humidity'].toDouble();
-          double rain = forecast['rain']?['3h'] ?? 0.0; // Rain in the past 3 hours, if available
-
-          String chanceOfIce = calculateChanceOfIce(tempCelsius, humidity, rain);
-
-          // Formatting the date and time
-          var dateTime = DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000);
-          String dayOfWeek = DateFormat('EEEE').format(dateTime); // Gets day of the week
-          String formattedDate = DateFormat('MMMdd').format(dateTime); // Gets the date in "Nov14" format
-          String timeOfDay = DateFormat('h:mm a').format(dateTime); // Time in "3:30 PM" format
-
+          print(forecast['hour'][0]['pressure_mb']); //avghumidity
           weatherData.add({
-            'location': location,
-            'date': '$dayOfWeek | $formattedDate $timeOfDay',
-            'weatherClassification': forecast['weather'][0]['main'] ?? 'No description',
-            'weatherDescription': forecast['weather'][0]['description'] ?? 'No description',
-            'temperature': tempCelsius.round().toInt(),
-            'windSpeed': '${forecast['wind']['speed']} m/s',
-            'pressure': '${forecast['main']['pressure']} hPa',
-            'chanceOfIce': chanceOfIce,
-            'humidity': '${forecast['main']['humidity']}%',
+            'location': weather['location'],
+            'date': forecast['date'],
+            'temperature': forecast['day']['avgtemp_c'].round(),
+            'condition': forecast['day']['condition']['text'],
+            'icon': forecast['day']['condition']['icon'],
+            'weatherClassification': forecast['day']['condition']['text'].split(' ').last,
+            'weatherDescription': forecast['day']['condition']['text'],
+            'windSpeed': forecast['day']['avgvis_miles'].toString(),
+            'pressure': forecast['hour'][0]['pressure_mb'].toString(),
+            'humidity': forecast['day']['avghumidity'].toString(),
+            'chanceOfIce': '${forecast['day']['daily_chance_of_snow']}%',
           });
         }
       });

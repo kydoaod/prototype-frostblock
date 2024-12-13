@@ -19,7 +19,7 @@ class SvgIcons {
   static SvgPicture cloudMistFog({double size = 64, Color? color}) =>
       SvgPicture.asset('${_basePath}cloud_mist_fog.svg', height: size, color: color);
   static SvgPicture cloudHelpOutline({double size = 64, Color? color}) =>
-      SvgPicture.asset('${_basePath}cloud_help_outline.svg', height: size, color: color);
+      SvgPicture.asset('${_basePath}cloud_sunshower.svg', height: size, color: color);
 
   // Indicator icons
   static SvgPicture indicatorWindDir({double size = 20, Color? color}) =>

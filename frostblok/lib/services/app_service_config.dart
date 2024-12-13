@@ -4,5 +4,10 @@ import 'package:frostblok/services/service_config.dart';
 class AppConfig implements ServiceConfig {
   @override
   String get openWeatherApiKey => dotenv.env['OPENWEATHER_API_KEY'] as String;
+  @override
   String get openWeatherBaseUrl => dotenv.env['OPENWEATHER_BASE_URL'] as String;
+  @override
+  String get weatherApiBaseUrl => dotenv.env['WEATHER_API_BASE_URL'] as String;
+  @override
+  String get weatherApiKey => dotenv.env['WEATHER_API_KEY'] as String;
 }
