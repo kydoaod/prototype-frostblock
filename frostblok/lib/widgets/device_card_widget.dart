@@ -63,7 +63,7 @@ class DeviceCard extends StatelessWidget {
             ),
             IconButton(
               icon: status == 'on'
-                  ? SvgIcons.actionDefrostOn(size: 24, color: Colors.blueAccent)
+                  ? SvgIcons.actionDefrostOn(size: 24, color: Colors.orange)
                   : SvgIcons.actionDefrostOff(size: 24, color: Colors.grey.shade400),
               onPressed: onToggle,
             ),

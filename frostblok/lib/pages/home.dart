@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frostblok/pages/add_device.dart';
 import 'package:frostblok/utils/converters.dart';
 import 'package:frostblok/widgets/weather_widgets.dart';
 import 'package:frostblok/widgets/device_card_widget.dart';  // Import DeviceCard
@@ -41,14 +42,31 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     );
   }
 
-  void _addNewDevice() {
-    setState(() {
-      devices.add({
-        'temperature': 30,
-        'location': 'New Location ${devices.length + 1}',
-        'status': 'off',
+  void _addNewDevice() async {
+    // setState(() {
+    //   devices.add({
+    //     'temperature': 30,
+    //     'location': 'New Location ${devices.length + 1}',
+    //     'status': 'off',
+    //   });
+    // });
+
+
+    final newDevice = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddDevicePage()),
+    );
+
+    // Check if newDevice contains location data and add a new device
+    if (newDevice != null && newDevice['location'] != null) {
+      setState(() {
+        devices.add({
+          'temperature': 30, // Default temperature, you can modify later
+          'location': newDevice['location'],
+          'status': 'off',
+        });
       });
-    });
+    }
   }
 
 
