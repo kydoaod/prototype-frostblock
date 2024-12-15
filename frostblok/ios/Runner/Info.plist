@@ -58,5 +58,7 @@
 		<string>bluetooth-central</string>
 		<string>bluetooth-peripheral</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>We need to access your camera to scan QR codes.</string>
 </dict>
 </plist>

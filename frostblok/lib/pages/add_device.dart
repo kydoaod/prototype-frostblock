@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frostblok/widgets/bluetooth_selector_widget.dart';
 import 'package:frostblok/widgets/location_selector_widget.dart';
+import 'package:frostblok/widgets/qr_scanner_widget.dart';
 
 class AddDevicePage extends StatefulWidget {
   @override
@@ -10,18 +12,30 @@ class _AddDevicePageState extends State<AddDevicePage> {
   final PageController _pageController = PageController();
   double progress = 0.0; // Track progress for the loading bar
   String selectedLocation = '';  // Store selected location
+  String selectedDevice = '';
+  String scannedQRCode = '';  // Variable to store the scanned QR code value
 
   // Method for navigating to the next page
   void goToNextPage() {
     if (_pageController.page == 0) {
-      // Location selected, proceed to QR page
+      // Location selected, proceed to Bluetooth page
       setState(() {
-        progress = 1.0; // Move progress bar
+        progress = 0.33; // Move progress bar to 1/3
       });
       _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
     } else if (_pageController.page == 1) {
-      // QR page complete, finish the process and navigate to the home page
-      Navigator.pop(context, {'location': selectedLocation});
+      // Bluetooth selected, proceed to QR scanner page
+      setState(() {
+        progress = 0.66; // Move progress bar to 2/3
+      });
+      _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
+    } else if (_pageController.page == 2) {
+      // QR scanner complete, finish the process and navigate to the home page
+      Navigator.pop(context, {
+        'location': selectedLocation,
+        'device': selectedDevice,
+        'scannedQRCode': scannedQRCode
+      });
     }
   }
 
@@ -29,10 +43,33 @@ class _AddDevicePageState extends State<AddDevicePage> {
   void goToPreviousPage() {
     if (_pageController.page == 1) {
       setState(() {
-        progress = 0.0;
+        progress = 0.33; // Move progress bar back to 1/3
+      });
+      _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
+    } else if (_pageController.page == 2) {
+      setState(() {
+        progress = 0.66; // Move progress bar back to 2/3
       });
       _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
     }
+  }
+
+  void onLocationSelected(location) {
+    setState(() {
+      selectedLocation = location;
+    });
+  }
+
+  void onDeviceSelected(device) {
+    setState(() {
+      selectedDevice = device;
+    });
+  }
+
+  void onScanQRCode(String scannedValue) {
+    setState(() {
+      scannedQRCode = scannedValue;  // Update the scanned QR code
+    });
   }
 
   @override
@@ -70,19 +107,15 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 children: [
                   // Page 1: Location Selection
                   LocationSelector(
-                    onLocationSelected: (location) {
-                      setState(() {
-                        selectedLocation = location;
-                      });
-                    },
+                    onLocationSelected: onLocationSelected,
                   ),
-
-                  // Page 2: Placeholder for QR Scanner
-                  const Center(
-                    child: Text(
-                      'QR Code Scanner Placeholder',
-                      style: TextStyle(fontSize: 18),
-                    ),
+                  // Page 2: Bluetooth Selector
+                  BluetoothSelector(
+                    onDeviceSelected: onDeviceSelected,
+                  ),
+                  // Page 3: QR Code Scanner
+                  QRCodeScanner(
+                    onQRCodeScanned: onScanQRCode,
                   ),
                 ],
               ),

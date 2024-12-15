@@ -1,4 +1,4 @@
-package com.example.frostblok
+package com.alphaonedesign.frostblok
 
 import io.flutter.embedding.android.FlutterActivity
 

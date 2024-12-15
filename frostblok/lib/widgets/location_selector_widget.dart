@@ -14,9 +14,21 @@ class _LocationSelectorState extends State<LocationSelector> {
   final List<String> locations = [
     'Garden City, UT',
     'Garden Sequa, ID',
-    'Rose Garden, OR'
+    'Rose Garden, OR',
   ];
   String? selectedLocation;
+
+  // Callback function for handling location selection
+  void handleLocationTap(String location) {
+    setState(() {
+      if (selectedLocation == location) {
+        selectedLocation = null; // Deselect if already selected
+      } else {
+        selectedLocation = location;
+      }
+    });
+    widget.onLocationSelected(selectedLocation ?? ""); // Send back data to parent widget
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +43,7 @@ class _LocationSelectorState extends State<LocationSelector> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
+
         // Search Bar
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -47,32 +60,25 @@ class _LocationSelectorState extends State<LocationSelector> {
             ),
           ),
         ),
+
         // List of Locations
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),  // Padding on sides
+            padding: const EdgeInsets.symmetric(horizontal: 16.0), // Padding on sides
             itemCount: locations.length,
             itemBuilder: (context, index) {
               final location = locations[index];
               final isSelected = location == selectedLocation;
+
               return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (isSelected) {
-                      selectedLocation = null;  // Deselect if already selected
-                    } else {
-                      selectedLocation = location;
-                    }
-                  });
-                  widget.onLocationSelected(selectedLocation ?? ""); // Send back data
-                },
+                onTap: () => handleLocationTap(location), // Use callback function
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(color: Colors.grey[300]!, width: 1), // Bottom border
                     ),
-                    color: isSelected ? Colors.white : Colors.transparent, // White only when selected
+                    color: isSelected ? Colors.white : Colors.transparent, // Highlight selected item
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -82,25 +88,24 @@ class _LocationSelectorState extends State<LocationSelector> {
                         location,
                         style: TextStyle(
                           fontSize: 16,
-                          color: isSelected ? Colors.blue : Colors.black, // Location text color
+                          color: isSelected ? Colors.blue : Colors.black, // Highlight text color
                         ),
                       ),
-                      // "Selected" text and Checkmark, only appear when selected
+
+                      // Selected indicator (text + checkmark)
                       if (isSelected)
-                        Row(
+                        const Row(
                           children: [
-                            // "Selected" text
-                            const Text(
+                            Text(
                               'Selected',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blue, // Blue color for selected text
+                                color: Colors.blue,
                               ),
                             ),
-                            const SizedBox(width: 4), // Space between "Selected" and checkmark
-                            // Checkmark icon
-                            const Icon(
+                            SizedBox(width: 4), // Space between text and checkmark
+                            Icon(
                               Icons.check_circle,
                               color: Colors.blue,
                               size: 20,
