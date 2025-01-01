@@ -1,9 +1,21 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BluetoothWrapperService {
 
+  Future<void> requestBluetoothPermissions() async {
+    PermissionStatus bluetoothStatus = await Permission.bluetooth.request();
+    PermissionStatus locationStatus = await Permission.location.request();
+
+    if (bluetoothStatus.isGranted && locationStatus.isGranted) {
+      print('Bluetooth and Location permissions granted');
+    } else {
+      print('Bluetooth or Location permissions not granted');
+    }
+  }
   // Initialize Bluetooth and ensure permissions are granted
   Future<void> initializeBluetooth() async {
+    await requestBluetoothPermissions();
     final bluetoothState = await FlutterBluePlus.adapterState.first;
     if (bluetoothState != BluetoothAdapterState.on) {
       print('Bluetooth is not enabled. Please enable it.');
