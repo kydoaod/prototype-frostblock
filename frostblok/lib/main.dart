@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frostblok/pages/home.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:frostblok/services/app_service_config.dart';
+import 'package:tuya_flutter/tuya_flutter.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -34,8 +35,32 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the Tuya SDK using the plugin.
+    TuyaFlutter.initTuya(appKey:  AppConfig().tuyaAppKey, appSecret: AppConfig().tuyaAppSecret).then((result) {
+      print("Init Result: $result");
+    }).catchError((error) {
+      print("Init Error: $error");
+    });
+
+    // Uncomment the following block if you want to test login as well.
+
+    // TuyaFlutter.loginWithEmail(
+    //   countryCode: "63",
+    //   email: "",
+    //   passwd: "",
+    // ).then((result) {
+    //   print("Login Result: $result");
+    // }).catchError((error) {
+    //   print("Login Error: $error");
+    // });
+  }
+
   final List<Widget> _pages = [
-    HomePage(), // Your existing HomePage
+    const HomePage(), // Your existing HomePage
     const PlaceholderWidget(text: 'Devices'),
     const PlaceholderWidget(text: 'Settings'),
     const PlaceholderWidget(text: 'Profile'),

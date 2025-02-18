@@ -5,7 +5,7 @@ import 'package:frostblok/services/bluetooth_wrapper_service.dart';
 class BluetoothSelector extends StatefulWidget {
   final ValueChanged<BluetoothDevice> onDeviceSelected;
 
-  const BluetoothSelector({Key? key, required this.onDeviceSelected}) : super(key: key);
+  const BluetoothSelector({super.key, required this.onDeviceSelected});
 
   @override
   _BluetoothSelectorState createState() => _BluetoothSelectorState();

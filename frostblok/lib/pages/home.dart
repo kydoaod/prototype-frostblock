@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frostblok/pages/add_device.dart';
-import 'package:frostblok/utils/converters.dart';
 import 'package:frostblok/widgets/weather_widgets.dart';
 import 'package:frostblok/widgets/device_card_widget.dart';  // Import DeviceCard
 import 'package:frostblok/pages/defrost_device.dart';  // Import DefrostDevicePage
 import 'package:frostblok/api/weather_api.dart';  // Import the WeatherApi class
-import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   final Key refreshKey = const Key('refresh-homepage'); // Unique key for state refresh
 
@@ -54,7 +52,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
     final newDevice = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddDevicePage()),
+      MaterialPageRoute(builder: (context) => const AddDevicePage()),
     );
 
     // Check if newDevice contains location data and add a new device
@@ -165,7 +163,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                     onToggle: () => _toggleDeviceStatus(index),
                     onTap: (context) => _navigateToDefrostDevicePage(context),
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),

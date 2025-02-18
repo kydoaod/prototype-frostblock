@@ -75,8 +75,8 @@ class AwesomeNotificationService {
             payload: hasPayload? {
               "id": "$id",
               "channelKey": 'scheduled_$alarmKey',
-              "title": "$title",
-              "body": "$body",
+              "title": title,
+              "body": body,
             }: null));
   }
 

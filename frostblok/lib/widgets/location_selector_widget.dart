@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class LocationSelector extends StatefulWidget {
   final ValueChanged<String> onLocationSelected;
 
-  const LocationSelector({Key? key, required this.onLocationSelected}) : super(key: key);
+  const LocationSelector({super.key, required this.onLocationSelected});
 
   @override
   _LocationSelectorState createState() => _LocationSelectorState();

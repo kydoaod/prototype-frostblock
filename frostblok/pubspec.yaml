@@ -43,6 +43,8 @@ dependencies:
   flutter_svg: ^2.0.16
   mobile_scanner: ^6.0.2
   permission_handler: ^11.3.1
+  tuya_flutter:
+    path: ../../tuya_flutter
 
 dev_dependencies:
   flutter_test:

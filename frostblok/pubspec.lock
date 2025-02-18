@@ -349,6 +349,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.2"
+  tuya_flutter:
+    dependency: "direct main"
+    description:
+      path: "../../tuya_flutter"
+      relative: true
+    source: path
+    version: "0.0.1"
   typed_data:
     dependency: transitive
     description:

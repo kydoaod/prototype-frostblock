@@ -5,9 +5,9 @@ class QRCodeScanner extends StatefulWidget {
   final ValueChanged<String> onQRCodeScanned; // Callback for scanned QR code
 
   const QRCodeScanner({
-    Key? key,
+    super.key,
     required this.onQRCodeScanned, // Pass scanned QR data back
-  }) : super(key: key);
+  });
 
   @override
   _QRCodeScannerState createState() => _QRCodeScannerState();

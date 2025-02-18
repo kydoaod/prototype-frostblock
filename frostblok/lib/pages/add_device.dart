@@ -4,6 +4,8 @@ import 'package:frostblok/widgets/location_selector_widget.dart';
 import 'package:frostblok/widgets/qr_scanner_widget.dart';
 
 class AddDevicePage extends StatefulWidget {
+  const AddDevicePage({super.key});
+
   @override
   _AddDevicePageState createState() => _AddDevicePageState();
 }
