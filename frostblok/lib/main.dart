@@ -42,6 +42,7 @@ class _MainScreenState extends State<MainScreen> {
     // Initialize the Tuya SDK using the plugin.
     TuyaFlutter.initTuya(appKey:  AppConfig().tuyaAppKey, appSecret: AppConfig().tuyaAppSecret).then((result) {
       print("Init Result: $result");
+      //testHomeAndToken();
     }).catchError((error) {
       print("Init Error: $error");
     });
@@ -59,6 +60,44 @@ class _MainScreenState extends State<MainScreen> {
     // });
   }
 
+  void testHomeAndToken() async {
+    try {
+      // Step 1: Create home and get homeId (or list of homes) from native.
+      final homeId = await TuyaFlutter.createHome(
+        name: "San Pedro Home",
+        lon: 121.041501,
+        lat: 14.357762,
+        geoName: "San Pedro, Laguna",
+        rooms: ["Living Room"],
+      );
+      print("Home created with ID: $homeId");
+
+      // Step 2: Get activator token with the homeId.
+      final tokenResult = await TuyaFlutter.getActivatorToken(homeId: homeId);
+      print("Activator token: $tokenResult");
+
+      // Step 3: Build the activator for scanning.
+      // Omit ssid and password to use scanning-only mode, if supported.
+      final buildResult = await TuyaFlutter.buildActivator(
+        token: tokenResult??"",
+        timeout: 100,
+        ssid: "",
+        password: ""
+        // Do not pass ssid and password if you want scanning only.
+      );
+      print("Activator built: $buildResult");
+
+      // Step 4: Start the activator (scanning process).
+      final startResult = await TuyaFlutter.startActivator();
+      print("Activator started: $startResult");
+
+      // The native side should forward scan events (like discovered devices)
+      // via callbacks (e.g., through an EventChannel or additional method channel calls).
+    } catch (e) {
+      print("Error during scanning: $e");
+    }
+  }
+
   final List<Widget> _pages = [
     const HomePage(), // Your existing HomePage
     const PlaceholderWidget(text: 'Devices'),
@@ -67,6 +106,7 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   void _onItemTapped(int index) {
+    testHomeAndToken();
     setState(() {
       _selectedIndex = index;
     });
