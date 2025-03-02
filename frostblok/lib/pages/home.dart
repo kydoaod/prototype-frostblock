@@ -3,7 +3,8 @@ import 'package:frostblok/pages/add_device.dart';
 import 'package:frostblok/widgets/weather_widgets.dart';
 import 'package:frostblok/widgets/device_card_widget.dart';  // Import DeviceCard
 import 'package:frostblok/pages/defrost_device.dart';  // Import DefrostDevicePage
-import 'package:frostblok/api/weather_api.dart';  // Import the WeatherApi class
+import 'package:frostblok/api/weather_api.dart';
+import 'package:tuya_flutter/tuya_flutter.dart';  // Import the WeatherApi class
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,6 +29,9 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   bool get wantKeepAlive => true; // Keep the widget state alive
 
   void _toggleDeviceStatus(int index) {
+    int ledToggle = devices[index]['status'] == 'on' ? 0 : 1;
+    print("-----${devices[index]}");
+    TuyaFlutter.sendDpCommand(devId: devices[index]['devId'], dpId: '101', dpValue: ledToggle); 
     setState(() {
       devices[index]['status'] = devices[index]['status'] == 'on' ? 'off' : 'on';
     });
@@ -56,13 +60,16 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     );
 
     // Check if newDevice contains location data and add a new device
-    if (newDevice != null && newDevice['location'] != null) {
+    print("newDevice $newDevice");
+    if (newDevice != null && newDevice['location'] != null && newDevice['ezDevice'] != null) {
       setState(() {
         devices.add({
           'temperature': 30, // Default temperature, you can modify later
           'location': newDevice['location'],
           'status': 'off',
+          'devId': newDevice['ezDevice']['devId']
         });
+        print(newDevice['ezDevice']['devId']);
       });
     }
   }

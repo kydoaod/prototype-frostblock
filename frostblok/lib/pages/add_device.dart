@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frostblok/widgets/bluetooth_selector_widget.dart';
+import 'package:frostblok/widgets/ez_device_selector_widget.dart';
 import 'package:frostblok/widgets/location_selector_widget.dart';
 import 'package:frostblok/widgets/qr_scanner_widget.dart';
 
@@ -14,8 +15,12 @@ class _AddDevicePageState extends State<AddDevicePage> {
   final PageController _pageController = PageController();
   double progress = 0.0; // Track progress for the loading bar
   String selectedLocation = '';  // Store selected location
-  String selectedDevice = '';
+  String selectedBTDevice = '';
   String scannedQRCode = '';  // Variable to store the scanned QR code value
+  var selectedEzDevice = {
+    "device": "",
+    "devId": ""
+  };
 
   // Method for navigating to the next page
   void goToNextPage() {
@@ -35,8 +40,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
       // QR scanner complete, finish the process and navigate to the home page
       Navigator.pop(context, {
         'location': selectedLocation,
-        'device': selectedDevice,
-        'scannedQRCode': scannedQRCode
+        'btDevice': selectedBTDevice,
+        'scannedQRCode': scannedQRCode,
+        'ezDevice': selectedEzDevice
       });
     }
   }
@@ -62,9 +68,16 @@ class _AddDevicePageState extends State<AddDevicePage> {
     });
   }
 
-  void onDeviceSelected(device) {
+  void onBTDeviceSelected(device) {
     setState(() {
-      selectedDevice = device;
+      selectedBTDevice = device;
+    });
+  }
+
+  void onEzDeviceSelected(device) {
+    setState(() {
+      selectedEzDevice["device"] = device["device"];
+      selectedEzDevice["devId"] = device["devId"];
     });
   }
 
@@ -113,12 +126,17 @@ class _AddDevicePageState extends State<AddDevicePage> {
                   ),
                   // Page 2: Bluetooth Selector
                   BluetoothSelector(
-                    onDeviceSelected: onDeviceSelected,
+                    onDeviceSelected: onBTDeviceSelected,
                   ),
+                  //Temporary page for scanned EzDevices
+                  EzDeviceSelector(
+                    onDeviceSelected: onEzDeviceSelected
+                  ),
+
                   // Page 3: QR Code Scanner
-                  QRCodeScanner(
-                    onQRCodeScanned: onScanQRCode,
-                  ),
+                  // QRCodeScanner(
+                  //   onQRCodeScanned: onScanQRCode,
+                  // ),
                 ],
               ),
             ),

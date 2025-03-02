@@ -42,7 +42,7 @@ android {
     }
 
     packagingOptions {
-        pickFirst 'lib/*/libc++_shared.so' // An Android Archive (AAR) file contains an Android library. If the .so file exists in multiple AAR files, select the first AAR file.
+        pickFirst 'lib/*/libc++_shared.so' 
     }
 
     signingConfigs {
