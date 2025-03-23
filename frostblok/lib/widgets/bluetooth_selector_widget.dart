@@ -87,7 +87,7 @@ class _BluetoothSelectorState extends State<BluetoothSelector> {
               final device = scanResults[index].device;
               return ListTile(
                 title: Text(device.platformName.isNotEmpty ? device.platformName : 'Unnamed Device'),
-                onTap: () => onSelectDevice(device.platformName),
+                onTap: () => onSelectDevice(device),
               );
             },
           ),

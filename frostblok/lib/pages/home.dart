@@ -18,11 +18,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin  {
   List<Map<String, dynamic>> weatherData = [];
   List<Map<String, dynamic>> devices = [
-    {
-      'temperature': 29,
-      'location': 'Garden City, UT',
-      'status': 'off',
-    },
+    // {
+    //   'temperature': 29,
+    //   'location': 'Garden City, UT',
+    //   'status': 'off',
+    // },
   ];
 
   @override

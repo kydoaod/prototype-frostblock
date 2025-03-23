@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:frostblok/widgets/bluetooth_selector_widget.dart';
 import 'package:frostblok/widgets/ez_device_selector_widget.dart';
 import 'package:frostblok/widgets/location_selector_widget.dart';
@@ -15,7 +16,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
   final PageController _pageController = PageController();
   double progress = 0.0; // Track progress for the loading bar
   String selectedLocation = '';  // Store selected location
-  String selectedBTDevice = '';
+  late BluetoothDevice selectedBTDevice;
   String scannedQRCode = '';  // Variable to store the scanned QR code value
   var selectedEzDevice = {
     "device": "",
