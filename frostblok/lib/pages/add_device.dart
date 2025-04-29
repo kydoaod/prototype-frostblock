@@ -41,9 +41,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
       // QR scanner complete, finish the process and navigate to the home page
       Navigator.pop(context, {
         'location': selectedLocation,
-        'btDevice': selectedBTDevice,
+        //'btDevice': selectedBTDevice,
         'scannedQRCode': scannedQRCode,
-        'ezDevice': selectedEzDevice
+        //'ezDevice': selectedEzDevice
       });
     }
   }
@@ -130,14 +130,14 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     onDeviceSelected: onBTDeviceSelected,
                   ),
                   //Temporary page for scanned EzDevices
-                  EzDeviceSelector(
-                    onDeviceSelected: onEzDeviceSelected
-                  ),
+                  // EzDeviceSelector(
+                  //   onDeviceSelected: onEzDeviceSelected
+                  // ),
 
                   // Page 3: QR Code Scanner
-                  // QRCodeScanner(
-                  //   onQRCodeScanned: onScanQRCode,
-                  // ),
+                  QRCodeScanner(
+                    onQRCodeScanned: onScanQRCode,
+                  ),
                 ],
               ),
             ),
