@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tuya_flutter/tuya_flutter.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:wifi_iot/wifi_iot.dart'; // Import the wifi_iot package
 
 class QRCodeScanner extends StatefulWidget {
-  final ValueChanged<String> onQRCodeScanned; // Callback for scanned QR code
+  final ValueChanged<String> onQRCodeScanned;
+  final ValueChanged<Map<String, dynamic>> onDeviceSelected;
 
   const QRCodeScanner({
     super.key,
-    required this.onQRCodeScanned, // Pass scanned QR data back
+    required this.onQRCodeScanned,
+    required this.onDeviceSelected
   });
 
   @override
@@ -17,10 +18,12 @@ class QRCodeScanner extends StatefulWidget {
 }
 
 class _QRCodeScannerState extends State<QRCodeScanner> {
-  bool _isScanComplete = false; // Track if the scan is complete
+  bool _isScanComplete = false;
+  bool _scanSuccess = false;
   bool isScanning = false;
   static const MethodChannel _channel = MethodChannel('tuya_flutter');
   List<Map<String, dynamic>> discoveredDevices = [];
+  String? scannedQRValue;
 
   @override
   void initState() {
@@ -32,14 +35,35 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
     if (call.method == "activatorCallback") {
       final Map<dynamic, dynamic> rawArgs = call.arguments;
       final String event = rawArgs["event"]?.toString() ?? "";
+      print("activatorCallback");
       print(rawArgs);
+
       if (event == "deviceFound") {
-        setState(() {
-          discoveredDevices.add({
-            "device": rawArgs["device"]?.toString() ?? "",
-            "devId": rawArgs["devId"]?.toString() ?? "",
+        final String device = rawArgs["device"]?.toString() ?? "";
+        final String devId = rawArgs["devId"]?.toString() ?? "";
+
+        print("Found device: $device");
+        print("Looking for: $scannedQRValue");
+
+        if (device == scannedQRValue) {
+          setState(() {
+            discoveredDevices.add({
+              "device": device,
+              "devId": devId,
+            });
+            _scanSuccess = true;
+            _isScanComplete = true;
+            widget.onDeviceSelected(discoveredDevices[0]);
           });
-        });
+          _stopScan();
+        } else {
+          try {
+            await _channel.invokeMethod('resetFactory', {'devId': devId});
+            print("Called resetFactory on $devId");
+          } catch (e) {
+            print("Error calling resetFactory: $e");
+          }
+        }
       }
     }
   }
@@ -48,36 +72,35 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
     setState(() {
       isScanning = true;
       discoveredDevices.clear();
+      _scanSuccess = false;
+      _isScanComplete = false;
     });
 
     try {
       const int homeId = 235518241;
       final tokenResult = await TuyaFlutter.getActivatorToken(homeId: homeId);
       print("Activator token: $tokenResult");
-      final homeDetail = await TuyaFlutter.getDeviceList(homeId: homeId);
-      print("Home Detail: $homeDetail");
 
       final buildResult = await TuyaFlutter.buildActivator(
         token: tokenResult ?? "",
         timeout: 100,
         ssid: "BAHAYSOLIS24G",
         password: "`1PLDTWIFIDBAPAa",
-        model: "THING_AP"
+        model: "THING_EZ",
       );
       print("Activator built: $buildResult");
+
       await TuyaFlutter.startActivator();
 
-      // Stop scanning after 30 seconds if no pairing success
-      Future.delayed(const Duration(seconds: 30), () {
-        if (!_isScanComplete) {
+      // Timeout after 100s if no match
+      Future.delayed(const Duration(seconds: 100), () {
+        if (!_scanSuccess) {
           setState(() {
             _isScanComplete = true;
           });
-          WiFiForIoTPlugin.forceWifiUsage(false);
           _stopScan();
         }
       });
-
     } catch (e) {
       print("Error starting activator: $e");
     }
@@ -89,9 +112,47 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
       setState(() {
         isScanning = false;
       });
-      print("Scan stopped after 30 seconds");
+      print("Scan stopped.");
     } catch (e) {
       print("Error stopping activator: $e");
+    }
+  }
+
+  Widget _buildScannerView() {
+    return MobileScanner(
+      onDetect: (BarcodeCapture barcodeCapture) {
+        final barcode = barcodeCapture.barcodes.first;
+        if (barcode.rawValue != null && scannedQRValue == null) {
+          final value = barcode.rawValue!;
+          setState(() {
+            scannedQRValue = value;
+          });
+          widget.onQRCodeScanned(value);
+          _startScan();
+        }
+      },
+    );
+  }
+
+  Widget _buildStatusView() {
+    if (isScanning && !_isScanComplete) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (_isScanComplete && _scanSuccess) {
+      return const Center(
+        child: Text(
+          "Scan complete. Device matched!",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      );
+    } else if (_isScanComplete && !_scanSuccess) {
+      return const Center(
+        child: Text(
+          "Scan failed. No matching device found.",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
+        ),
+      );
+    } else {
+      return _buildScannerView();
     }
   }
 
@@ -105,72 +166,13 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: SizedBox(
-              width: double.infinity, // Ensure it takes the full width
-              height: MediaQuery.of(context).size.height * 0.7, // Take 80% of the screen height
-              child: _isScanComplete
-                  ? const Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Scan complete, please tap next", // Display completion message
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  : MobileScanner(
-                      onDetect: (BarcodeCapture barcodeCapture) {
-                        final barcode = barcodeCapture.barcodes.first;
-                        if (barcode.rawValue != null && !_isScanComplete) {
-                          widget.onQRCodeScanned(barcode.rawValue!); 
-                          _connectToWifi(barcode.rawValue!);
-                        }
-                      },
-                    ),
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: _buildStatusView(),
             ),
           ),
         ),
       ],
     );
-  }
-
-  // Function to connect to the Wi-Fi network using the QR code string
-  void _connectToWifi(String wifiString) async {
-    // Example Wi-Fi string format: WIFI:T:nopass;S:SmartLife-63B8;;
-    final wifiDetails = wifiString.split(';');
-    String? ssid;
-    String? password;
-    String? securityType;
-
-    // Extract SSID, password, and security type
-    for (var detail in wifiDetails) {
-      if (detail.startsWith('S:')) {
-        ssid = detail.substring(2);
-      } else if (detail.startsWith('P:')) {
-        password = detail.substring(2);
-      } else if (detail.startsWith('T:')) {
-        securityType = detail.substring(2);
-      }
-    }
-
-    // Attempt to connect to the Wi-Fi network
-    if (ssid != null) {
-      bool success = false;
-      if (securityType == 'nopass' || securityType == null) {
-        // If no password, connect to an open network
-        success = await WiFiForIoTPlugin.connect(ssid, security: NetworkSecurity.NONE);
-      } else {
-        // If there is a password, attempt to connect with it
-        if (password != null) {
-          success = await WiFiForIoTPlugin.connect(ssid, password: password);
-        }
-      }
-      WiFiForIoTPlugin.forceWifiUsage(true);
-      // If successfully connected, set _isScanComplete to true
-      if (success) {
-        _startScan();
-        print("Successfully connected to $ssid");
-      } else {
-        print("Failed to connect to Wi-Fi");
-      }
-    }
   }
 }

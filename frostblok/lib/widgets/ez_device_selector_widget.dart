@@ -26,7 +26,6 @@ class _EzDeviceSelectorState extends State<EzDeviceSelector> {
     if (call.method == "activatorCallback") {
       // Cast raw arguments bilang Map<dynamic, dynamic>
       final Map<dynamic, dynamic> rawArgs = call.arguments;
-      // Kunin ang event bilang string gamit ang toString()
       final String event = rawArgs["event"]?.toString() ?? "";
       print(rawArgs);
       if (event == "deviceFound") {

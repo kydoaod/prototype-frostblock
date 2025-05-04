@@ -43,7 +43,8 @@ class _AddDevicePageState extends State<AddDevicePage> {
         'location': selectedLocation,
         //'btDevice': selectedBTDevice,
         'scannedQRCode': scannedQRCode,
-        //'ezDevice': selectedEzDevice
+        if (scannedQRCode != '')
+          'ezDevice': selectedEzDevice,
       });
     }
   }
@@ -137,6 +138,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                   // Page 3: QR Code Scanner
                   QRCodeScanner(
                     onQRCodeScanned: onScanQRCode,
+                    onDeviceSelected: onEzDeviceSelected,
                   ),
                 ],
               ),
