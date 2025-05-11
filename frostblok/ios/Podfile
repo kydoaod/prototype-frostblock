@@ -34,6 +34,7 @@ target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
   # Include the Tuya SDK dependencies
+  pod "ThingSmartActivatorKit"
   pod "ThingSmartCryption", :path => './ios_core_sdk/ThingSmartCryption.podspec'
   pod "ThingSmartHomeKit"
   pod "ThingSmartBusinessExtensionKit"
